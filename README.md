@@ -11,11 +11,36 @@ As a student with hands-on experience in RISC-V processors and IoT systems, this
 ## Repository Structure
 
 ```
-/documentation    # Research reports, documentation, and core research gap summaries
-/models          # Domain-specific fine-tuning scripts for models like ChipLlama or VeriGen
-/datasets        # Scripts and links for processing DFT datasets (VeriDFT, ForgeEDA, EDA Corpus)
-/orchestrator    # Action layer adapters for interfacing with EDA tools (OpenROAD, Yosys)
-/evaluations     # Benchmarks using ITC'99 and VerilogEval for fault coverage and PPA metrics
+Agentic-DFT-Flow/
+├── .gitignore
+├── README.md
+├── requirements.txt
+│
+├── rtl/                        # Hardware descriptions
+│   ├── dynamic_lfsr.v          # Agent-controlled pattern generator
+│   ├── agentic_misr.v          # Agent-monitored response analyzer
+│   └── target_cut/             # The actual circuit being tested
+│
+├── sim/                        # Verification and Simulation
+│   ├── tb_agentic_bist.sv      # SystemVerilog testbench
+│   └── waveforms/              # Saved .vcd or .fst GTKWave configs
+│
+├── agents/                     # The Python-based AI Cognitive Stack
+│   ├── thermal_agent.py        # Monitors multiphysics limits
+│   ├── bist_orchestrator.py    # Analyzes MISR and updates LFSR seeds
+│   └── prompts/                # System instructions for the LLM
+│
+├── adapters/                   # The Action Layer [cite: 101]
+│   ├── openroad_adapter.py     # Executes OpenROAD Tcl scripts [cite: 156]
+│   └── yosys_adapter.py        # Executes Yosys synthesis [cite: 167]
+│
+├── scripts/                    # Legacy EDA execution files
+│   ├── synth.tcl               # Standard Yosys synthesis script
+│   └── sta.tcl                 # Static Timing Analysis script
+│
+└── docs/                       # Research and Documentation
+    ├── Agentic_AI_in_DFT.pdf   # The original research paper
+    └── Architecture.md         # Explaining the Multi-Agent setup
 ```
 
 ## Key Research Gaps Addressed
@@ -50,12 +75,59 @@ Adapters executing commands in open-source toolchains like OpenROAD and SymbiYos
 - **Verification**: Formal tools for equivalence checking
 - **Hardware**: FPGA platforms for TinyML agent deployment
 
+## 🚀 Quickstart: Running the Multi-Agent Simulation Locally
+
+This repository is designed to be easily reproducible. You can simulate both the hardware verification (Verilog/SystemVerilog) and the software orchestration (Python Multi-Agent System) locally.
+
+### Prerequisites
+Ensure you have the following open-source tools installed on your system:
+* **Python 3.10+** (For the AI Cognitive Stack)
+* **Icarus Verilog (`iverilog`)** (For RTL simulation)
+* **GTKWave** (For waveform visualization)
+* **Yosys** (For logic synthesis and area overhead validation)
+
+### Step 1: Environment Setup
+First, clone the repository and install the required Python dependencies for the AI agents:
+
+```bash
+git clone https://github.com/aashishniranjanb/Agentic-DFT-Flow.git
+cd Agentic-DFT-Flow
+python -m venv venv
+source venv/bin/activate  # On Windows use: venv\Scripts\activate
+pip install -r requirements.txt
+```
+
+### Step 2: Hardware Compilation & Baseline Simulation
+Before launching the AI, you can verify the baseline hardware functionality of the Dynamic Agentic BIST architecture. Use the included Makefile to compile the Verilog and run the SystemVerilog testbench:
+
+```bash
+make simulate
+```
+
+Note: This will output agentic_bist_sim.vcd. You can view the exact signal changes (such as the Agent updating the LFSR seed to isolate a fault) by running `make wave`.
+
+### Step 3: Launching the AI Orchestrator
+To see the transition to Level 3 Agentic EDA in action, run the main Python orchestration script. This initializes the ATPG Orchestrator, the Action Agent, and the Neuro-Symbolic Verification Agent.
+
+```bash
+python agents/bist_orchestrator.py
+```
+
+Watch the terminal as the agents ingest the simulated multiphysics telemetry, negotiate thermal throttling parameters, and autonomously adapt the BIST hardware.
+
+### Step 4: Logic Synthesis & Area Validation
+In Design for Test (DFT), keeping the physical area overhead below 5% is critical. Run the automated synthesis script to generate a statistical gate-count report using Yosys:
+
+```bash
+make synthesize
+```
+
 ## Getting Started
 
 1. Clone the repository
 2. Install dependencies (requirements.txt forthcoming)
-3. Review documentation in `/documentation`
-4. Explore evaluation benchmarks in `/evaluations`
+3. Review documentation in `/docs`
+4. Explore evaluation benchmarks in `/sim`
 
 ## Contributing
 
